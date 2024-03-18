@@ -5,10 +5,8 @@ import com.bobocode.util.ExerciseNotCompletedException;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * {@link CrazyGenerics} is an exercise class. It consists of classes, interfaces and methods that should be updated
@@ -110,7 +108,7 @@ public class CrazyGenerics {
      * @param <T> – a type of the entity that should be a subclass of {@link BaseEntity}
      * @param <C> – a type of any collection
      */
-    interface CollectionRepository<T extends BaseEntity, C> { // todo: update interface according to the javadoc
+    interface CollectionRepository<T extends BaseEntity, C extends Collection<T>> { // todo: update interface according to the javadoc
         void save(T entity);
 
         C getEntityCollection();
@@ -122,7 +120,7 @@ public class CrazyGenerics {
      *
      * @param <T> – a type of the entity that should be a subclass of {@link BaseEntity}
      */
-    interface ListRepository<T extends BaseEntity> extends CollectionRepository {
+    interface ListRepository<T extends BaseEntity> extends CollectionRepository<T, List<T>> {
 
     }
 
@@ -136,7 +134,13 @@ public class CrazyGenerics {
      *
      * @param <E> a type of collection elements
      */
-    interface ComparableCollection<E extends Comparable<? super E>> extends Comparable { // todo: refactor it to make generic and provide a default impl of compareTo
+    interface ComparableCollection<E extends Comparable<? super E>> extends Collection<E>, Comparable<ComparableCollection<E>> {
+        // todo: refactor it to make generic and provide a default impl of compareTo
+        @Override
+        default int compareTo(ComparableCollection<E> other) {
+            // Compare the sizes of two collections
+            return Integer.compare(this.size(), other.size());
+        }
     }
 
     /**
@@ -150,7 +154,7 @@ public class CrazyGenerics {
          *
          * @param list
          */
-        public static <E> void print(List<? extends Comparable> list) {
+        public static void print(List<?> list) {
             // todo: refactor it so the list of any type can be printed, not only integers
             list.forEach(element -> System.out.println(" – " + element));
         }
@@ -163,8 +167,13 @@ public class CrazyGenerics {
          * @param entities provided collection of entities
          * @return true if at least one of the elements has null id
          */
-        public static boolean hasNewEntities(Collection<BaseEntity> entities) {
-            throw new ExerciseNotCompletedException(); // todo: refactor parameter and implement method
+        public static boolean hasNewEntities(Collection<? extends BaseEntity> entities) {
+          for (BaseEntity base: entities){
+              if (base.getUuid()  == null){
+                  return true;
+              }
+          }
+          return false;
         }
 
         /**
@@ -176,8 +185,13 @@ public class CrazyGenerics {
          * @param validationPredicate criteria for validation
          * @return true if all entities fit validation criteria
          */
-        public static boolean isValidCollection() {
-            throw new ExerciseNotCompletedException(); // todo: add method parameters and implement the logic
+        public static boolean isValidCollection(Collection<? extends BaseEntity> entities, Predicate<? super BaseEntity> validationPredicate) {
+            for (BaseEntity entity: entities){
+                if(! validationPredicate.test(entity)){
+                    return false;
+                }
+            }
+            return true;
         }
 
         /**
@@ -190,8 +204,12 @@ public class CrazyGenerics {
          * @param <T>          entity type
          * @return true if entities list contains target entity more than once
          */
-        public static boolean hasDuplicates() {
-            throw new ExerciseNotCompletedException(); // todo: update method signature and implement it
+        public static <T extends BaseEntity> boolean hasDuplicates(List<BaseEntity> entities, T targetEntity) {
+            long count = entities.stream()
+                    .filter(entity ->entity.getUuid().equals(targetEntity.getUuid()))
+                    .count();
+            return count> 1;
+
         }
 
         /**
