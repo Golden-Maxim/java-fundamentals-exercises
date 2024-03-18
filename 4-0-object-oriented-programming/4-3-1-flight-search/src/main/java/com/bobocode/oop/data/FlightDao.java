@@ -3,6 +3,7 @@ package com.bobocode.oop.data;
 import com.bobocode.util.ExerciseNotCompletedException;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Set;
  * todo: 2. Implement a method {@link FlightDao#findAll()} that returns a set of all flight numbers
  */
 public class FlightDao {
-    private Set<String> flights = new HashSet<>();
+    private final Set<String> flights = new HashSet<>();
 
     /**
      * Stores a new flight number
@@ -22,7 +23,7 @@ public class FlightDao {
      * @return {@code true} if a flight number was stored, {@code false} otherwise
      */
     public boolean register(String flightNumber) {
-        throw new ExerciseNotCompletedException();// todo: implement this method
+        return this.flights.add(flightNumber);
     }
 
     /**
@@ -31,7 +32,19 @@ public class FlightDao {
      * @return a set of flight numbers
      */
     public Set<String> findAll() {
-        throw new ExerciseNotCompletedException();// todo: implement this method
+        return this.flights;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FlightDao flightDao = (FlightDao) o;
+        return Objects.equals(flights, flightDao.flights);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(flights);
+    }
 }
