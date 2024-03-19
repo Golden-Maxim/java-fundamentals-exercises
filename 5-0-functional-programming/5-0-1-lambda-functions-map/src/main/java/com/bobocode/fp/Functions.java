@@ -1,8 +1,5 @@
 package com.bobocode.fp;
 
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
-
 /**
  * An util class that provides a factory method for creating an instance of a {@link FunctionMap} filled with a list
  * of functions.
@@ -37,7 +34,18 @@ public class Functions {
         intFunctionMap.addFunction("increment", s -> s + 1);
         intFunctionMap.addFunction("decrement", s -> s - 1);
         intFunctionMap.addFunction("square", s -> s * s);
-
+        intFunctionMap.addFunction("abs", x -> {
+            if (x < 0) return -x;
+            else return x;
+        });
+        intFunctionMap.addFunction("sgn", x -> {
+            if (x < 0)
+                return -1;
+            else if (x > 0)
+                return 1;
+            else
+                return 0;
+        });
 
 
         return intFunctionMap;
