@@ -1,5 +1,6 @@
 package com.bobocode.fp;
 
+import com.bobocode.model.Account;
 import com.bobocode.util.ExerciseNotCompletedException;
 
 import java.math.BigDecimal;
@@ -185,7 +186,7 @@ public class CrazyLambdas {
      * @return a binary function that receiver predicate and function and compose them to create a new function
      */
     public static BiFunction<IntUnaryOperator, IntPredicate, IntUnaryOperator> functionToConditionalFunction() {
-        throw new ExerciseNotCompletedException();
+        return (intUnaryOperator, intPredicate) -> input -> intPredicate.test(input) ? intUnaryOperator.applyAsInt(input) : input;
     }
 
     /**
@@ -196,7 +197,7 @@ public class CrazyLambdas {
      * @return a high-order function that fetches a function from a function map by a given name or returns identity()
      */
     public static BiFunction<Map<String, IntUnaryOperator>, String, IntUnaryOperator> functionLoader() {
-        throw new ExerciseNotCompletedException();
+        return (map, str) -> map.getOrDefault(str, IntUnaryOperator.identity());
     }
 
     /**
@@ -214,7 +215,12 @@ public class CrazyLambdas {
      * @return a comparator instance
      */
     public static <T, U extends Comparable<? super U>> Comparator<T> comparing(Function<? super T, ? extends U> mapper) {
-        throw new ExerciseNotCompletedException();
+
+        return (o1, o2) -> {
+          U val1 = mapper.apply(o1);
+          U val2 = mapper.apply(o1);
+          return val1.compareTo(val2);
+        };
     }
 
     /**
@@ -234,7 +240,14 @@ public class CrazyLambdas {
      */
     public static <T, U extends Comparable<? super U>> Comparator<T> thenComparing(
             Comparator<? super T> comparator, Function<? super T, ? extends U> mapper) {
-        throw new ExerciseNotCompletedException();
+
+        return (t1, t2) -> {
+            int compared = comparator.compare(t1, t2);
+            if (compared != 0) {
+                return compared;
+            }
+            return mapper.apply(t1).compareTo(mapper.apply(t2));
+        };
     }
 
     /**
